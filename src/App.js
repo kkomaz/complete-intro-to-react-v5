@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import ReactDOM from "react-dom";
 import { Router, Link } from "@reach/router";
-import Details from "./Details";
-import SearchParams from "./SearchParams";
 import ThemeContext from "./ThemeContext";
+
+// Will not load this code until later and required to render
+// Dynamic import this from somewhere
+// Code splits into a separate bundle
+// Suspense will use fallback while loading
+// If you are going to code split, its better to do it 30kb+
+const Details = lazy(() => import('./Details'));
+const SearchParams = lazy(() => import('./SearchParams'));
 
 const App = () => {
   const theme = useState("darkblue");
@@ -13,10 +19,12 @@ const App = () => {
         <header>
           <Link to="/">Adopt Me!</Link>
         </header>
-        <Router>
-          <SearchParams path="/" />
-          <Details path="/details/:id" />
-        </Router>
+        <Suspense fallback={<h1>Loading route...</h1>}>
+          <Router>
+            <SearchParams path="/" />
+            <Details path="/details/:id" />
+          </Router>
+        </Suspense>
       </div>
     </ThemeContext.Provider>
   );
